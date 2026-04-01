@@ -1,32 +1,43 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { logoutApi, verifyAuth } from '../api/auth';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (access: string, refresh: string) => void;
-  logout: () => void;
+  /** True while the initial /auth/verify/ check is in flight. */
+  isLoading: boolean;
+  /** Call after a successful login — no tokens needed, they live in cookies. */
+  login: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
-    () => !!localStorage.getItem('access_token')
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Start in loading state so PrivateRoute waits for the verify check before
+  // redirecting to /login (avoids a flash redirect for already-logged-in users).
+  const [isLoading, setIsLoading] = useState(true);
 
-  const login = (access: string, refresh: string) => {
-    localStorage.setItem('access_token', access);
-    localStorage.setItem('refresh_token', refresh);
-    setIsAuthenticated(true);
-  };
+  useEffect(() => {
+    verifyAuth()
+      .then(() => setIsAuthenticated(true))
+      .catch(() => setIsAuthenticated(false))
+      .finally(() => setIsLoading(false));
+  }, []);
 
-  const logout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+  const login = () => setIsAuthenticated(true);
+
+  const logout = async () => {
+    try {
+      await logoutApi();
+    } catch {
+      // Server-side cookie clearing is best-effort; clear local state regardless.
+    }
     setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

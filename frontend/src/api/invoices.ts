@@ -2,8 +2,8 @@ import api from './axios';
 import { Invoice, InvoiceFormData } from '../types';
 
 export async function getInvoices(): Promise<Invoice[]> {
-  const { data } = await api.get<Invoice[]>('/invoices/');
-  return data;
+  const { data } = await api.get<{ results: Invoice[] }>('/invoices/');
+  return data.results;
 }
 
 export async function getInvoice(id: number): Promise<Invoice> {

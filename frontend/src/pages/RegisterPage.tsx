@@ -1,28 +1,30 @@
 import { useState, FormEvent } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { login } from '../api/auth';
+import { Link, useNavigate } from 'react-router-dom';
+import { register } from '../api/auth';
+import { parseApiError } from '../utils/errors';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login: authLogin } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const { registered, deleted } = (location.state ?? {}) as { registered?: boolean; deleted?: boolean };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
-      await login(username, password);
-      authLogin();
-      navigate('/dashboard');
-    } catch {
-      setError('Invalid username or password.');
+      await register(username, password, confirmPassword);
+      navigate('/login', { state: { registered: true } });
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: unknown } };
+      setError(parseApiError(axiosErr?.response?.data));
     } finally {
       setLoading(false);
     }
@@ -32,9 +34,7 @@ export default function LoginPage() {
     <div className="login-container">
       <div className="login-card">
         <h1 className="login-title">Ledger</h1>
-        <p className="login-subtitle">Invoice Management</p>
-        {deleted && <div className="alert alert-success">Your account has been deleted.</div>}
-        {registered && <div className="alert alert-success">Account created. You can now sign in.</div>}
+        <p className="login-subtitle">Create an account</p>
         {error && <div className="alert alert-error">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -44,7 +44,6 @@ export default function LoginPage() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="admin"
               required
               autoFocus
             />
@@ -56,16 +55,25 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
           </div>
           <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
         <p style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem' }}>
-          Don't have an account? <Link to="/register">Create one</Link>
+          Already have an account? <Link to="/login">Sign in</Link>
         </p>
       </div>
     </div>

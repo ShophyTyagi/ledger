@@ -21,6 +21,12 @@ export default function Sidebar({ isSidebarOpen }: { isSidebarOpen: boolean }) {
         >
           Invoices
         </Link>
+        <Link
+          to="/account"
+          className={location.pathname === '/account' ? 'active' : ''}
+        >
+          Account
+        </Link>
       </div>
     </aside>
   );

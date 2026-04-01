@@ -412,6 +412,12 @@ h1.page-title {
   border: 1px solid var(--color-danger);
 }
 
+.alert-success {
+  background: #f0fff4;
+  color: #276749;
+  border: 1px solid #9ae6b4;
+}
+
 /* ─── Auth pages ─────────────────────────────────────── */
 
 .login-container {
@@ -787,6 +793,46 @@ h1.page-title {
 
 .link:hover::after {
   background: var(--color-primary-hover);
+}
+
+/* ─── Filter bar ─────────────────────────────────────── */
+
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.filter-input {
+  padding: 10px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  color: var(--color-text);
+  background: #ffffff;
+  outline: none;
+  transition: var(--transition);
+  font-family: inherit;
+  min-width: 0;
+  flex: 1;
+}
+
+.filter-input:hover {
+  border-color: var(--color-border-hover);
+}
+
+.filter-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.15);
+}
+
+.filter-count {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  margin-bottom: 12px;
 }
 
 /* ─── Misc ───────────────────────────────────────────── */

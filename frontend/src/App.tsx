@@ -3,6 +3,8 @@ import { AuthProvider } from './context/AuthContext';
 import { CurrencyProvider } from './context/CurrencyContext';
 import PrivateRoute from './components/PrivateRoute';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import AccountPage from './pages/AccountPage';
 import DashboardPage from './pages/DashboardPage';
 import InvoicesPage from './pages/InvoicesPage';
 import NewInvoicePage from './pages/NewInvoicePage';
@@ -16,6 +18,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route
             path="/dashboard"
             element={
@@ -45,6 +48,14 @@ export default function App() {
             element={
               <PrivateRoute>
                 <EditInvoicePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              <PrivateRoute>
+                <AccountPage />
               </PrivateRoute>
             }
           />

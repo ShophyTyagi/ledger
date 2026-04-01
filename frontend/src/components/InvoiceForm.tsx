@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InvoiceFormData, LineItem, InvoiceStatus } from '../types';
 import { useCurrency } from '../context/CurrencyContext';
+import { parseApiError } from '../utils/errors';
 
 interface InvoiceFormProps {
   initialData?: InvoiceFormData;
@@ -72,16 +73,8 @@ export default function InvoiceForm({ initialData, onSubmit, submitLabel }: Invo
         status,
       });
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: Record<string, unknown> } };
-      const detail = axiosErr?.response?.data;
-      if (detail && typeof detail === 'object') {
-        const msgs = Object.entries(detail)
-          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
-          .join(' | ');
-        setError(msgs);
-      } else {
-        setError('An error occurred. Please try again.');
-      }
+      const axiosErr = err as { response?: { status?: number; data?: unknown } };
+      setError(parseApiError(axiosErr?.response?.data));
     } finally {
       setLoading(false);
     }

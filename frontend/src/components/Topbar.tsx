@@ -7,8 +7,8 @@ export default function Topbar({ toggleSidebar }: { toggleSidebar: () => void })
   const navigate = useNavigate();
   const { currency, setCurrency } = useCurrency();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/login');
   };
 

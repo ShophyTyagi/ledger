@@ -35,7 +35,3 @@ export interface DashboardData {
   recent_invoices: Invoice[];
 }
 
-export interface AuthTokens {
-  access: string;
-  refresh: string;
-}
